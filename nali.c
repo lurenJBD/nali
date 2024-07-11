@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
@@ -8,21 +9,26 @@
 #include "libqqwry/qqwry.h"
 #include "config.h"
 
+// Function declarations
 static void gbk_to_utf8(char *src, char *dst, size_t dst_size);
 static int is_valid_ipv4(const char *ip);
 static int is_valid_ipv6(const char *ip);
 
 int main(int argc, char *argv[])
 {
+    // Set locale to support UTF-8
     setlocale(LC_ALL, "");
+
+    // Check if stdin is interactive (terminal)
     if (isatty(fileno(stdin)) && argc <= 1) {
         printf("Please enter IPs addresses (separated by space): ");
-        fflush(stdout);
+        fflush(stdout); // Ensure prompt is displayed immediately
     }
 
     // Default to getting large range address information
     int detailed_info = 0; // 0 for large range, 1 for detailed information
 
+    // Check if user specified detailed information option
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "-d") == 0) {
             detailed_info = 1;
@@ -30,15 +36,19 @@ int main(int argc, char *argv[])
         }
     }
 
+    // Read IP addresses from command line arguments or stdin
     char **ips = NULL;
     int ip_count = 0;
 
     if (argc > 1) {
+        // Allocate memory for IPs
         ips = malloc((argc - 1) * sizeof(char *));
         if (ips == NULL) {
             fprintf(stderr, "Memory allocation failed.\n");
             return 1;
         }
+        
+        // Validate and store valid IPs
         for (int i = 1; i < argc; i++) {
             if (strcmp(argv[i], "-d") != 0) { // Skip the -d flag itself
                 if (is_valid_ipv4(argv[i]) || is_valid_ipv6(argv[i])) {
@@ -58,6 +68,7 @@ int main(int argc, char *argv[])
         // Remove newline character if present
         input[strcspn(input, "\n")] = '\0';
         
+        // Tokenize input by spaces to get IP addresses
         char *token;
         ips = malloc(128 * sizeof(char *));
         if (ips == NULL) {
@@ -80,21 +91,29 @@ int main(int argc, char *argv[])
     }
 
     FILE *wry_file = NULL;
+
+    // Attempt to open the default path first
     wry_file = fopen(NALI_QQWRY_PATH, "r");
+    
+    // If the default path fails, try opening from current directory
     if (wry_file == NULL) {
         wry_file = fopen("./qqwry.dat", "r");
     }
+    
+    // If neither file could be opened, print an error message and exit
     if (wry_file == NULL) {
         fprintf(stderr, "Failed to open qqwry.dat file. Make sure it exists.\n");
         return 1;
     }
 
+    // Loop through each IP address and retrieve location information
     for (int i = 0; i < ip_count; ++i) {
         char address[1024] = {'\0'};
         char company[1024] = {'\0'};
         char utf8_address[2048] = {'\0'};
         char utf8_company[2048] = {'\0'}; 
 
+        // Get location information based on current IP address
         int success;
         success = qqwry_get_location(address, company, ips[i], wry_file);
         if (success) {
@@ -110,11 +129,16 @@ int main(int argc, char *argv[])
             fprintf(stderr, "Failed to retrieve location information for IP: %s\n", ips[i]);
         }
         
+        // Free memory allocated by strdup
         free(ips[i]);
     }
 
+    // Free the array of IPs
     free(ips);
+
+    // Close file
     fclose(wry_file);
+
     return 0;
 }
 
@@ -140,38 +164,16 @@ static void gbk_to_utf8(char *src, char *dst, size_t dst_size)
     iconv_close(cd);
 }
 
+// Function to check if string is a valid IPv4 address
 static int is_valid_ipv4(const char *ip)
 {
     struct in_addr addr;
     return inet_pton(AF_INET, ip, &addr);
 }
 
+// Function to check if string is a valid IPv6 address
 static int is_valid_ipv6(const char *ip)
 {
     struct in6_addr addr;
     return inet_pton(AF_INET6, ip, &addr);
 }
-
-        if (wry_file!=NULL) {
-            break;
-        }
-    }
-    qqwry_get_location(country,area,ip,wry_file);
-    fclose(wry_file);
-    if (strlen(country)>0) {
-        printf("%s",country);
-    }
-    if (strlen(area)>0) {
-        if (strlen(country)>0) {
-            printf(" ");
-        }
-        if (strlen(country)<=0) {
-            printf("unknown");
-        } else {
-            printf("%s",area);
-        }
-    }
-    printf("\n");
-    return 0;
-}
-
