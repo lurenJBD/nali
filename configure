@@ -12,14 +12,14 @@ fi
 
 if test ! -d ./libqqwry
 then
-    echo there is no ./libqqwry
-    echo see http://code.google.com/p/qqwry/
+    echo missing files ./libqqwry
+    echo see https://github.com/out0fmemory/nali
     exit 1
 fi
 
-if test ! -f ./share/QQWry.Dat
+if test ! -f ./share/qqwry.dat
 then
-    echo please download QQWry.Dat from https://chenze.name/wenjian/QQWry.Dat 
+    echo please download qqwry.dat from https://raw.githubusercontent.com/FW27623/qqwry/main/qqwry.dat 
     exit 1
 fi
 
@@ -62,7 +62,7 @@ datadir=$datadir
 EOF
 
 cat > config.h << EOF
-#define NALI_QQWRY_PATH "$datadir/QQWry.Dat"
+#define NALI_QQWRY_PATH "$datadir/qqwry.dat"
 EOF
 
 cat > bin/nali << EOF
@@ -77,35 +77,28 @@ EOF
 
 cat > bin/nali-update << EOF
 #!/bin/sh
-#qqwry_dat_url="https://chenze.name/wenjian/QQWry.Dat";
-qqwry_dat_url="https://github.com/out0fmemory/qqwry.dat/raw/master/qqwry_lastest.dat";
-qqwry_dat_local_path="$datadir/QQWry.Dat"
+qqwry_dat_url="https://raw.githubusercontent.com/FW27623/qqwry/main/qqwry.dat";
+qqwry_dat_local_path="$datadir/qqwry.dat"
 curl=\`which curl\`
 wget=\`which wget\`
 
-if ! test -w \$qqwry_dat_local_path
+if test -f /tmp/qqwry.dat
 then
-    echo You may need sudo
-    exit 1
-fi
-
-if test -f /tmp/QQWry.Dat
-then
-    rm -f /tmp/QQWry.Dat || exit 1
+    rm -f /tmp/qqwry.dat
 fi
 
 if test "x\$curl" != "x" &&  test -x \$curl 
 then
-    command="\$curl -L  -k --compressed \$qqwry_dat_url -o /tmp/QQWry.Dat"
+    command="\$curl -L  -k --compressed \$qqwry_dat_url -o /tmp/qqwry.dat"
 elif test "x\$wget" != "x" &&  test -x \$wget
 then
-    command="\$wget --no-check-certificate \$qqwry_dat_url -O /tmp/QQWry.Dat"
+    command="\$wget --no-check-certificate \$qqwry_dat_url -O /tmp/qqwry.dat"
 else
     echo Error: Please install curl or wget
     exit 1
 fi 
 echo Updating \$qqwry_dat_local_path
-\$command && mv /tmp/QQWry.Dat \$qqwry_dat_local_path && echo Successfully Updated && exit 0
+\$command && mv /tmp/qqwry.dat \$qqwry_dat_local_path && echo Successfully Updated && exit 0
 
 echo Failed to update
 exit 1
@@ -117,4 +110,4 @@ echo "Install:"
 echo 'make && make install'
 echo
 echo "Usage and Examples:";
-echo 'http://www.surfchen.org/wiki/Nali'
+echo 'https://github.com/out0fmemory/nali/wiki/Nali'
