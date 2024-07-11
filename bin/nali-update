@@ -1,0 +1,27 @@
+#!/bin/sh
+qqwry_dat_url="https://raw.githubusercontent.com/FW27623/qqwry/main/qqwry.dat";
+qqwry_dat_local_path="/usr/local/share/qqwry.dat"
+curl=`which curl`
+wget=`which wget`
+
+
+if test -f /tmp/qqwry.dat
+then
+    rm -f /tmp/qqwry.dat
+fi
+
+if test "x$curl" != "x" &&  test -x $curl 
+then
+    command="$curl -L  -k --compressed $qqwry_dat_url -o /tmp/qqwry.dat"
+elif test "x$wget" != "x" &&  test -x $wget
+then
+    command="$wget --no-check-certificate $qqwry_dat_url -O /tmp/qqwry.dat"
+else
+    echo Error: Please install curl or wget
+    exit 1
+fi 
+echo Updating $qqwry_dat_local_path
+$command && mv /tmp/qqwry.dat $qqwry_dat_local_path && echo Successfully Updated && exit 0
+
+echo Failed to update
+exit 1

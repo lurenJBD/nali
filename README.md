@@ -6,9 +6,9 @@
 
 1. 单文件运行，不再依赖 `Perl`
 2. 支持指定查询详细，通过 `-d` 选项来决定是否查看IP的公司归属，默认不显示
-3. 不支持原版配合 `dig`、`cat`、`mtr`、`nslookup`、`traceroute`的管道使用
+3. 不支持配合 `dig`、`cat`、`mtr`、`nslookup`、`traceroute`、`ping` 的管道使用
 
-### 编译&安装
+### 编译&安装&使用
 
 ```bash
 git clone https://github.com/lurenJBD/nali.git
@@ -16,6 +16,10 @@ cd nali
 ./configure
 make
 make install
+# 卸载
+make uninstall
+# 安装后更新 qqwry.dat
+nali-update
 ```
 
 > 安装的默认路径为：/usr/local/bin
@@ -38,3 +42,11 @@ root@local:~/# nali -d 1.1.1.1 2606:4700:4700::1111
 1.1.1.1[澳大利亚 APNIC/CloudFlare公共DNS服务器]
 2606:4700:4700::1111[美国–弗吉尼亚州–劳登县–阿什本 Akamai节点]
 ```
+
+### 单文件运行说明
+
+在执行 `make` 后，可将 `bin/nali` 文件单独拷贝到其他目录下使用，但不保证百分百可以运行，如果运行不了可以本机编译一次
+
+### 关于纯真IP数据库 `qqwry.dat` 的来源
+
+来自 https://github.com/FW27623/qqwry

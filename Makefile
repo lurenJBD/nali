@@ -19,3 +19,4 @@ distclean: clean
 
 clean:
 	rm -f bin/nali
+	rm -f bin/nali-update
